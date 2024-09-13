@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { AirlineEntity } from "../airline/airline.entity";
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class AirportEntity {
@@ -17,4 +18,7 @@ export class AirportEntity {
 
     @Column()
     country: string;
+
+    @ManyToMany(() => AirlineEntity, airline => airline.airports)
+    airlines: AirlineEntity[];
 }
