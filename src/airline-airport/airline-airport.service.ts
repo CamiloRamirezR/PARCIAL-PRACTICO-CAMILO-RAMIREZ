@@ -180,6 +180,10 @@ export class AirlineAirportService {
         airline.airports = airline.airports.filter((a) => a.id !== airportId);
         await this.airlineRepository.save(airline);
 
+        if (!airport.airlines) {
+            airport.airlines = [];
+        }
+
         airport.airlines = airport.airlines.filter((a) => a.id !== airlineId);
         await this.airportRepository.save(airport);
     }
