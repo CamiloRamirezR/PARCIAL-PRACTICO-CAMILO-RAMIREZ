@@ -63,7 +63,10 @@ export class AirportService {
             );
         }
 
-        return this.airportRepository.save(airport);
+        return this.airportRepository.save({
+            ...existingAirport,
+            ...airport,
+        });
     }
 
     async delete(id: string) {
