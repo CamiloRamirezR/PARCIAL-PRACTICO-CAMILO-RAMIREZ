@@ -37,8 +37,9 @@ export class AirlineService {
 
     async create(airline: AirlineEntity): Promise<AirlineEntity> {
         const currentDate = new Date();
+        const foundationDate = new Date(airline.foundationDate);
 
-        if (airline.foundationDate > currentDate) {
+        if (foundationDate > currentDate) {
             throw new BusinessLogicException(
                 'The foundation date cannot be in the future',
                 BusinessError.PRECONDITION_FAILED,
@@ -51,6 +52,7 @@ export class AirlineService {
     async update(id: string, airline: AirlineEntity): Promise<AirlineEntity> {
         const existingAirline = await this.airlineRepository.findOne({ where: { id } });
         const currentDate = new Date();
+        const foundationDate = new Date(airline.foundationDate);
 
         if (!existingAirline) {
             throw new BusinessLogicException(
@@ -59,7 +61,7 @@ export class AirlineService {
             );
         }
 
-        if (airline.foundationDate > currentDate) {
+        if (foundationDate > currentDate) {
             throw new BusinessLogicException(
                 'The foundation date cannot be in the future',
                 BusinessError.PRECONDITION_FAILED,
