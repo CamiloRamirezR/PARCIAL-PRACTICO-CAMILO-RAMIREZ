@@ -160,31 +160,43 @@ export class AirlineAirportService {
             where: { id: airlineId },
             relations: ['airports'],
         });
-
+    
         if (!airline) {
             throw new BusinessLogicException(
                 unknownMsg('airline'),
                 BusinessError.NOT_FOUND,
             );
         }
-
-        const airport: AirportEntity = airline.airports.find((a) => a.id === airportId);
-
+    
+        const airport: AirportEntity = await this.airportRepository.findOne({
+            where: { id: airportId },
+            relations: ['airlines'],
+        });
+    
         if (!airport) {
+            throw new BusinessLogicException(
+                unknownMsg('airport'),
+                BusinessError.NOT_FOUND,
+            );
+        }
+
+        const airportFromAirline = airline.airports.find((a) => a.id === airportId);
+        if (!airportFromAirline) {
             throw new BusinessLogicException(
                 'Airport not related to the airline',
                 BusinessError.PRECONDITION_FAILED,
             );
         }
-
+    
         airline.airports = airline.airports.filter((a) => a.id !== airportId);
         await this.airlineRepository.save(airline);
-
+    
         if (!airport.airlines) {
             airport.airlines = [];
         }
-
+    
         airport.airlines = airport.airlines.filter((a) => a.id !== airlineId);
         await this.airportRepository.save(airport);
     }
+    
 }
