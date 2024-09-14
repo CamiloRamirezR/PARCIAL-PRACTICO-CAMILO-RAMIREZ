@@ -85,7 +85,7 @@ export class AirlineService {
             );
         }
 
-        return this.airlineRepository.remove(airline);
+        await this.airlineRepository.remove(airline);
     }
 
 }
