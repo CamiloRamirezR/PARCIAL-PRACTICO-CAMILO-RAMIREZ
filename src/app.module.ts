@@ -6,6 +6,7 @@ import { AirportModule } from './airport/airport.module';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AirportEntity } from './airport/airport.entity';
 import { AirlineEntity } from './airline/airline.entity';
+import { AirlineAirportModule } from './airline-airport/airline-airport.module';
 
 
 function databaseConfigFromEnv(): TypeOrmModuleOptions {
@@ -43,7 +44,8 @@ function databaseConfigFromEnv(): TypeOrmModuleOptions {
       keepConnectionAlive: true,
     }),
     AirlineModule,
-    AirportModule
+    AirportModule,
+    AirlineAirportModule
   ],
   controllers: [AppController],
   providers: [AppService],
