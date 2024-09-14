@@ -1,0 +1,484 @@
+{
+	"info": {
+		"_postman_id": "d993ed9a-d153-470d-aee7-a1cb8b3fb802",
+		"name": "Aerolineas",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27025245"
+	},
+	"item": [
+		{
+			"name": "Crear una aerolinea",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 201\", function () {\r",
+							"  pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Airlines endpoint response should have the correct schema\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  pm.expect(responseData).to.be.an('object');\r",
+							"  pm.expect(responseData.id).to.be.a(\"string\");\r",
+							"  pm.collectionVariables.set(\"AIRLINE_ID\", responseData.id);\r",
+							"  pm.collectionVariables.set(\"AIRLINE_NAME\", responseData.name);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"ADA\",\r\n    \"description\": \"Aerolineas de Antioquia\",\r\n    \"website\": \"www.ada.com\",\r\n    \"foundationDate\": \"2000-01-01\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/airlines",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airlines"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear una aerolínea inválida",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 412\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(412);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response time is less than 200ms\", function () {\r",
+							"  pm.expect(pm.response.responseTime).to.be.below(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields - statusCode and message\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.statusCode).to.exist;\r",
+							"    pm.expect(responseData.message).to.exist;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Aerolínea del futuro\",\r\n    \"description\": \"Aerolínea que no ha sido fundada\",\r\n    \"website\": \"www.no-existe.com\",\r\n    \"foundationDate\": \"3000-01-01\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/airlines",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airlines"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener todas las aerolineas",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has the required fields\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array');\r",
+							"    responseData.forEach(function(airline) {\r",
+							"        pm.expect(airline).to.have.property('id');\r",
+							"        pm.expect(airline).to.have.property('name');\r",
+							"        pm.expect(airline).to.have.property('description');\r",
+							"        pm.expect(airline).to.have.property('website');\r",
+							"        pm.expect(airline).to.have.property('foundationDate');\r",
+							"        pm.expect(airline).to.have.property('airports');\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate response properties\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array').that.is.not.empty;\r",
+							"\r",
+							"    responseData.forEach(function(item) {\r",
+							"        pm.expect(item.id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"ID should be a non-empty string\");\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/airlines",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airlines"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener una aerolínea por ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"ID should matches previous creation\", function () {\r",
+							"     var responseJSON = pm.response.json();\r",
+							"     pm.expect(responseJSON).to.be.an('object');\r",
+							"     pm.expect(responseJSON.id).to.equal(pm.collectionVariables.get(\"AIRLINE_ID\"));\r",
+							"});\r",
+							"\r",
+							"pm.test(\"NAME should matches previous creation\", function () {\r",
+							"     var responseJSON = pm.response.json();\r",
+							"     pm.expect(responseJSON).to.be.an('object');\r",
+							"     pm.expect(responseJSON.name).to.equal(pm.collectionVariables.get(\"AIRLINE_NAME\"));\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/airlines/{{AIRLINE_ID}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airlines",
+						"{{AIRLINE_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener una aerolínea por un ID que no existe",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"UNKNOWN_AIRLINE\", \"0000-0000-0000-0000\")"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 404\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(404);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has the required fields - statusCode and message\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.statusCode).to.exist;\r",
+							"    pm.expect(responseData.message).to.exist;\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/airlines/{{UNKNOWN_AIRLINE}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airlines",
+						"{{UNKNOWN_AIRLINE}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar una aerolínea",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"ID should matches previous creation\", function () {\r",
+							"     var responseJSON = pm.response.json();\r",
+							"     pm.expect(responseJSON).to.be.an('object');\r",
+							"     pm.expect(responseJSON.id).to.equal(pm.collectionVariables.get(\"AIRLINE_ID\"));\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"ADA - Recargado\",\r\n    \"description\": \"Aerolineas de Antioquia - Recargado\",\r\n    \"website\": \"www.ada.com\",\r\n    \"foundationDate\": \"2020-10-10\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/airlines/{{AIRLINE_ID}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airlines",
+						"{{AIRLINE_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar una aerolínea con ID que no existe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response has the required fields - statusCode and message\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.statusCode).to.exist;\r",
+							"    pm.expect(responseData.message).to.exist;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response status code is 404\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(404);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Aerolínea Imaginaria\",\r\n    \"description\": \"Aerolinea que no existe\",\r\n    \"website\": \"www.no-existe.com\",\r\n    \"foundationDate\": \"2000-01-01\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/airlines/{{UNKNOWN_AIRLINE}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airlines",
+						"{{UNKNOWN_AIRLINE}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar una aerolínea por su ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 204\", function () {\r",
+							"  pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/airlines/{{AIRLINE_ID}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airlines",
+						"{{AIRLINE_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar una aerolínea con un ID que no existe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response has the required fields - statusCode and message\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.statusCode).to.exist;\r",
+							"    pm.expect(responseData.message).to.exist;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response status code is 404\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(404);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/airlines/{{UNKNOWN_AIRLINE}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airlines",
+						"{{UNKNOWN_AIRLINE}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": "http://localhost:3000/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "AIRLINE_ID",
+			"value": ""
+		},
+		{
+			"key": "AIRLINE_NAME",
+			"value": ""
+		},
+		{
+			"key": "UNKNOWN_AIRLINE",
+			"value": ""
+		}
+	]
+}
