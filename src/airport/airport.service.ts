@@ -79,6 +79,6 @@ export class AirportService {
             );
         }
 
-        await this.airportRepository.delete({ id });
+        await this.airportRepository.remove(airport);
     }
 }
