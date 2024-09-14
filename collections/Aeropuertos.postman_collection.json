@@ -1,0 +1,458 @@
+{
+	"info": {
+		"_postman_id": "a788dab0-6b73-41d9-8a66-ca17378d5d9a",
+		"name": "Aeropuertos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27025245"
+	},
+	"item": [
+		{
+			"name": "Crear un aeropuerto válido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 201\", function () {\r",
+							"  pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Airport response should have the correct schema\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  pm.expect(responseData).to.be.an('object');\r",
+							"  pm.expect(responseData.id).to.be.a(\"string\");\r",
+							"  pm.collectionVariables.set(\"AIRPORT_ID\", responseData.id);\r",
+							"  pm.collectionVariables.set(\"AIRPORT_NAME\", responseData.name);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Aeropuerto Internacional José María Cordova\",\r\n    \"code\": \"MDE\",\r\n    \"city\": \"Medellín\",\r\n    \"country\": \"Colombia\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/airports",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airports"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear un aeropuerto inválido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 412\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(412);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has the required fields - statusCode and message\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.statusCode).to.exist;\r",
+							"    pm.expect(responseData.message).to.exist;\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Aeropuerto Inválido\",\r\n    \"code\": \"MDE-DEM-HUO\",\r\n    \"city\": \"Medellín\",\r\n    \"country\": \"Colombia\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/airports",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airports"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener todos los aeropuertos",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has the required fields\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array').that.is.not.empty;\r",
+							"    responseData.forEach(function(airline) {\r",
+							"        pm.expect(airline).to.have.property('id');\r",
+							"        pm.expect(airline).to.have.property('name');\r",
+							"        pm.expect(airline).to.have.property('code');\r",
+							"        pm.expect(airline).to.have.property('city');\r",
+							"        pm.expect(airline).to.have.property('country');\r",
+							"        pm.expect(airline).to.have.property('airlines');\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/airports",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airports"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener un aeropuerto por ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"ID should matches previous creation\", function () {\r",
+							"     var responseJSON = pm.response.json();\r",
+							"     pm.expect(responseJSON).to.be.an('object');\r",
+							"     pm.expect(responseJSON.id).to.equal(pm.collectionVariables.get(\"AIRPORT_ID\"));\r",
+							"});\r",
+							"\r",
+							"pm.test(\"NAME should matches previous creation\", function () {\r",
+							"     var responseJSON = pm.response.json();\r",
+							"     pm.expect(responseJSON).to.be.an('object');\r",
+							"     pm.expect(responseJSON.name).to.equal(pm.collectionVariables.get(\"AIRPORT_NAME\"));\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/airports/{{AIRPORT_ID}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airports",
+						"{{AIRPORT_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener un aeropuerto por un ID que no existe",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"UNKNOWN_AIRPORT\", \"0000-0000-0000-0000\")\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 404\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(404);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has the required fields - statusCode and message\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.statusCode).to.exist;\r",
+							"    pm.expect(responseData.message).to.exist;\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/airports/{{UNKNOWN_AIRPORT}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airports",
+						"{{UNKNOWN_AIRPORT}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar aeropuerto",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"ID should matches previous creation\", function () {\r",
+							"     var responseJSON = pm.response.json();\r",
+							"     pm.expect(responseJSON).to.be.an('object');\r",
+							"     pm.expect(responseJSON.id).to.equal(pm.collectionVariables.get(\"AIRPORT_ID\"));\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Aeropuerto Internacional José María Cordova\",\r\n    \"code\": \"MDE\",\r\n    \"city\": \"Rionegro\",\r\n    \"country\": \"Colombia\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/airports/{{AIRPORT_ID}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airports",
+						"{{AIRPORT_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar un aeropuerto con un ID que no existe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response has the required fields - statusCode and message\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.statusCode).to.exist;\r",
+							"    pm.expect(responseData.message).to.exist;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response status code is 404\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(404);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"No existe\",\r\n    \"code\": \"MDE\",\r\n    \"city\": \"Medellín\",\r\n    \"country\": \"Colombia\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/airports/{{UNKNOWN_AIRPORT}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airports",
+						"{{UNKNOWN_AIRPORT}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar un aeropuerto por su ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 204\", function () {\r",
+							"  pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/airports/{{AIRPORT_ID}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airports",
+						"{{AIRPORT_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar un aeropuerto con un ID que no existe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response has the required fields - statusCode and message\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.statusCode).to.exist;\r",
+							"    pm.expect(responseData.message).to.exist;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response status code is 404\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(404);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/airports/{{UNKNOWN_AIRPORT}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"airports",
+						"{{UNKNOWN_AIRPORT}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": "http://localhost:3000/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "AIRPORT_ID",
+			"value": ""
+		},
+		{
+			"key": "AIRPORT_NAME",
+			"value": ""
+		},
+		{
+			"key": "UNKNOWN_AIRPORT",
+			"value": ""
+		}
+	]
+}
