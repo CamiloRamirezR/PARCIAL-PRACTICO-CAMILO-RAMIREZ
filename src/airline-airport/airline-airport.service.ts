@@ -99,43 +99,61 @@ export class AirlineAirportService {
         return airportFromAirline;
     }
 
-    async updateAirportsFromAirline ( airlineId: string, airports: AirportEntity[]): Promise<AirlineEntity> {
+    async updateAirportsFromAirline(
+        airlineId: string,
+        airports: AirportEntity[],
+      ): Promise<AirlineEntity> {
         const airline: AirlineEntity = await this.airlineRepository.findOne({
-            where: { id: airlineId },
-            relations: ['airports'],
+          where: { id: airlineId },
+          relations: ['airports'],
         });
-
+      
         if (!airline) {
-            throw new BusinessLogicException(
-                unknownMsg('airline'),
-                BusinessError.NOT_FOUND,
-            );
+          throw new BusinessLogicException(unknownMsg('airline'), BusinessError.NOT_FOUND);
         }
-
+      
         const validatedAirports: AirportEntity[] = [];
         for (const airport of airports) {
-            const foundAirport: AirportEntity = await this.airportRepository.findOne({
-                where: { id: airport.id },
-            });
-
-            if (!foundAirport) {
-                throw new BusinessLogicException(
-                    unknownMsg('airport'),
-                    BusinessError.NOT_FOUND,
-                );
-            }
-
-            validatedAirports.push(foundAirport);
+          const foundAirport: AirportEntity = await this.airportRepository.findOne({
+            where: { id: airport.id },
+            relations: ['airlines'],
+          });
+      
+          if (!foundAirport) {
+            throw new BusinessLogicException(unknownMsg('airport'), BusinessError.NOT_FOUND);
+          }
+      
+          validatedAirports.push(foundAirport);
         }
-
+      
         airline.airports = validatedAirports;
         await this.airlineRepository.save(airline);
-
+      
+        for (const airport of validatedAirports) {
+          if (!airport.airlines) {
+            airport.airlines = [];
+          }
+      
+          if (!airport.airlines.some((a) => a.id === airline.id)) {
+            airport.airlines.push(airline);
+          }
+      
+          await this.airportRepository.save(airport);
+        }
+      
+        const existingAirports = airline.airports;
+        for (const airport of existingAirports) {
+          if (!validatedAirports.some((a) => a.id === airport.id)) {
+            airport.airlines = airport.airlines.filter((a) => a.id !== airline.id);
+            await this.airportRepository.save(airport);
+          }
+        }
+      
         return await this.airlineRepository.findOne({
-            where: { id: airlineId },
-            relations: ['airports'],
+          where: { id: airlineId },
+          relations: ['airports'],
         });
-    }
+    }      
 
     async deleteAirportFromAirline(airlineId: string, airportId: string): Promise<void> {
         const airline: AirlineEntity = await this.airlineRepository.findOne({
