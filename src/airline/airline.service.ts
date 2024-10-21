@@ -2,92 +2,109 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AirlineEntity } from './airline.entity';
 import { Repository } from 'typeorm';
-import { BusinessError, BusinessLogicException } from '../shared/errors/business-errors';
+import {
+  BusinessError,
+  BusinessLogicException,
+} from '../shared/errors/business-errors';
 import { unknownMsg } from '../shared/utils/validation.utils';
 
 @Injectable()
 export class AirlineService {
+  constructor(
+    @InjectRepository(AirlineEntity)
+    private airlineRepository: Repository<AirlineEntity>,
+  ) {}
 
-    constructor(
-        @InjectRepository(AirlineEntity)
-        private airlineRepository: Repository<AirlineEntity>,
-    ) {}
+  async findAll(): Promise<AirlineEntity[]> {
+    return this.airlineRepository.find({
+      relations: ['airports'],
+    });
+  }
 
-    async findAll(): Promise<AirlineEntity[]> {
-        return this.airlineRepository.find({
-            relations: ['airports'],
-        });
+  async findOne(id: string): Promise<AirlineEntity> {
+    const airline: AirlineEntity = await this.airlineRepository.findOne({
+      where: { id },
+      relations: ['airports'],
+    });
+
+    if (!airline) {
+      throw new BusinessLogicException(
+        unknownMsg('airline'),
+        BusinessError.NOT_FOUND,
+      );
     }
 
-    async findOne(id: string): Promise<AirlineEntity> {
-        const airline: AirlineEntity = await this.airlineRepository.findOne({
-            where: { id },
-            relations: ['airports'],
-        });
+    return airline;
+  }
 
-        if (!airline) {
-            throw new BusinessLogicException(
-                unknownMsg('airline'),
-                BusinessError.NOT_FOUND,
-            );
-        }
-        
-        return airline;
+  async create(airline: AirlineEntity): Promise<AirlineEntity> {
+    const currentDate = new Date();
+    const foundationDate = new Date(airline.foundationDate);
+
+    if (foundationDate > currentDate) {
+      throw new BusinessLogicException(
+        'The foundation date cannot be in the future',
+        BusinessError.PRECONDITION_FAILED,
+      );
     }
 
-    async create(airline: AirlineEntity): Promise<AirlineEntity> {
-        const currentDate = new Date();
-        const foundationDate = new Date(airline.foundationDate);
+    return this.airlineRepository.save(airline);
+  }
 
-        if (foundationDate > currentDate) {
-            throw new BusinessLogicException(
-                'The foundation date cannot be in the future',
-                BusinessError.PRECONDITION_FAILED,
-            );
-        }
+  async create_2(airline: AirlineEntity): Promise<AirlineEntity> {
+    const currentDate = new Date();
+    const foundationDate = new Date(airline.foundationDate);
 
-        return this.airlineRepository.save(airline);
+    if (foundationDate > currentDate) {
+      throw new BusinessLogicException(
+        'The foundation date cannot be in the future',
+        BusinessError.PRECONDITION_FAILED,
+      );
     }
 
-    async update(id: string, airline: AirlineEntity): Promise<AirlineEntity> {
-        const existingAirline = await this.airlineRepository.findOne({ where: { id } });
-        const currentDate = new Date();
-        const foundationDate = new Date(airline.foundationDate);
+    return this.airlineRepository.save(airline);
+  }
 
-        if (!existingAirline) {
-            throw new BusinessLogicException(
-                unknownMsg('airline'),
-                BusinessError.NOT_FOUND,
-            );
-        }
+  async update(id: string, airline: AirlineEntity): Promise<AirlineEntity> {
+    const existingAirline = await this.airlineRepository.findOne({
+      where: { id },
+    });
+    const currentDate = new Date();
+    const foundationDate = new Date(airline.foundationDate);
 
-        if (foundationDate > currentDate) {
-            throw new BusinessLogicException(
-                'The foundation date cannot be in the future',
-                BusinessError.PRECONDITION_FAILED,
-            );
-        }
-
-        return await this.airlineRepository.save({
-            ...existingAirline,
-            ...airline,
-        });        
+    if (!existingAirline) {
+      throw new BusinessLogicException(
+        unknownMsg('airline'),
+        BusinessError.NOT_FOUND,
+      );
     }
 
-    async delete(id: string){
-        const airline = await this.airlineRepository.findOne({ 
-            where: { id },
-            relations: ['airports'],
-        });
-
-        if (!airline) {
-            throw new BusinessLogicException(
-                unknownMsg('airline'),
-                BusinessError.NOT_FOUND,
-            );
-        }
-
-        await this.airlineRepository.remove(airline);
+    if (foundationDate > currentDate) {
+      throw new BusinessLogicException(
+        'The foundation date cannot be in the future',
+        BusinessError.PRECONDITION_FAILED,
+      );
     }
 
+    return await this.airlineRepository.save({
+      ...existingAirline,
+      ...airline,
+    });
+  }
+
+  async delete(id: string) {
+    const airline = await this.airlineRepository.findOne({
+      where: { id },
+      relations: ['airports'],
+    });
+
+    if (!airline) {
+      throw new BusinessLogicException(
+        unknownMsg('airline'),
+        BusinessError.NOT_FOUND,
+      );
+    }
+
+    await this.airlineRepository.remove(airline);
+  }
 }
