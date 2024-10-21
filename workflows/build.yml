@@ -15,7 +15,7 @@ jobs:
       # 1. Checkout the repository
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0 # Para tener un historial completo, shallow clones están deshabilitados.
 
       # 2. Set up Node.js
       - name: Set up Node.js
@@ -40,8 +40,9 @@ jobs:
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Necesario para obtener información de los PR, si es que hay alguno
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # El token de SonarCloud que configuraste
         with:
           args: >
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info  
+            -Dsonar.coverage.exclusions=**/*.spec.ts
