@@ -106,6 +106,33 @@ export class AirlineService {
     });
   }
 
+  async update_2(id: string, airline: AirlineEntity): Promise<AirlineEntity> {
+    const existingAirline = await this.airlineRepository.findOne({
+      where: { id },
+    });
+    const currentDate = new Date();
+    const foundationDate = new Date(airline.foundationDate);
+
+    if (!existingAirline) {
+      throw new BusinessLogicException(
+        unknownMsg('airline'),
+        BusinessError.NOT_FOUND,
+      );
+    }
+
+    if (foundationDate > currentDate) {
+      throw new BusinessLogicException(
+        'The foundation date cannot be in the future',
+        BusinessError.PRECONDITION_FAILED,
+      );
+    }
+
+    return await this.airlineRepository.save({
+      ...existingAirline,
+      ...airline,
+    });
+  }
+
   async delete(id: string) {
     const airline = await this.airlineRepository.findOne({
       where: { id },
