@@ -1,48 +1,20 @@
 name: Build
-
 on:
   push:
     branches:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
-
 jobs:
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
     steps:
-      # 1. Checkout the repository
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Para tener un historial completo, shallow clones están deshabilitados.
-
-      # 2. Set up Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.20.4' # Ajusta la versión de Node.js según tu proyecto
-
-      # 3. Install dependencies
-      - name: Install dependencies
-        run: npm install
-
-      # 4. Set up environment for SQLite (si es necesario)
-      - name: Set environment variables
-        run: |
-          echo "DATABASE_URL=sqlite://db.sqlite" >> $GITHUB_ENV
-
-      # 5. Run tests and collect coverage
-      - name: Run tests and generate coverage report
-        run: npm run test:cov # Ejecuta las pruebas y genera el reporte de cobertura
-
-      # 6. SonarCloud Scan
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Necesario para obtener información de los PR, si es que hay alguno
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # El token de SonarCloud que configuraste
-        with:
-          args: >
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info  
-            -Dsonar.coverage.exclusions=**/*.spec.ts
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
